@@ -358,7 +358,7 @@ def plot_gridworld(
 
             rect = plt.Rectangle(
                 (c, gs - r - 1), 1, 1,
-                color=color, linewidth=0.5, edgecolor="#BDC3C7"
+                facecolor=color, linewidth=0.5, edgecolor="#BDC3C7"
             )
             ax.add_patch(rect)
             if label:

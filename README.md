@@ -2,7 +2,8 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
-[![Tests](https://img.shields.io/badge/tests-110%20passed%20%2F%20110-brightgreen.svg)]()
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B.svg?logo=streamlit)](https://streamlit.io/)
+[![Tests](https://img.shields.io/badge/tests-118%20passed%20%2F%20118-brightgreen.svg)]()
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PhD Research](https://img.shields.io/badge/Research-PhD%20Track-purple.svg)]()
@@ -24,12 +25,13 @@
 - [4. Environment: Deterministic & Stochastic GridWorld](#4-environment-deterministic--stochastic-gridworld)
 - [5. System Architecture & Repository Structure](#5-system-architecture--repository-structure)
 - [6. Installation & Quickstart](#6-installation--quickstart)
-- [7. Experimental Protocols & Reproducibility](#7-experimental-protocols--reproducibility)
-  - [7.1 Reproducing Experiments](#71-reproducing-experiments)
-  - [7.2 Experimental Results](#72-experimental-results)
-- [8. Test Suite](#8-test-suite)
-- [9. PhD Research Roadmap & Future Extensions](#9-phd-research-roadmap--future-extensions)
-- [10. Citation & License](#10-citation--license)
+- [7. Interactive Web Application (Streamlit)](#7-interactive-web-application-streamlit)
+- [8. Experimental Protocols & Reproducibility](#8-experimental-protocols--reproducibility)
+  - [8.1 Reproducing Experiments](#81-reproducing-experiments)
+  - [8.2 Experimental Results](#82-experimental-results)
+- [9. Test Suite](#9-test-suite)
+- [10. PhD Research Roadmap & Future Extensions](#10-phd-research-roadmap--future-extensions)
+- [11. Citation & License](#11-citation--license)
 
 ---
 
@@ -137,6 +139,7 @@ The benchmark environment is a custom, fully reproducible $N \times N$ discrete 
 
 ```
 observational-rl/
+├── app.py                       # Interface web interactive Streamlit (4 pages)
 ├── configs/
 │   └── default.yaml             # Complete hyperparameter specifications
 ├── docs/
@@ -167,13 +170,17 @@ observational-rl/
 │       ├── training/            # Execution loops & runners
 │       │   ├── trainer.py       # Episode runners & TrainingHistory tracking
 │       │   └── experiment_runner.py # Multi-seed batch runner & CSV exporter
+│       ├── ui/                  # UI helpers for Streamlit interface
+│       │   ├── __init__.py
+│       │   └── helpers.py       # Rendering, presets, step simulation & CSV loader
 │       └── visualization/       # Scientific publication plotting
 │           └── plots.py         # Seaborn/Matplotlib learning curves, heatmaps
-├── tests/                       # 110 Comprehensive Unit & Integration Tests
+├── tests/                       # 118 Comprehensive Unit & Integration Tests
 │   ├── test_agents.py
 │   ├── test_demonstrations.py
 │   ├── test_environment.py
-│   └── test_training.py
+│   ├── test_training.py
+│   └── test_ui.py
 ├── CITATION.cff                 # Formal academic citation metadata
 ├── LICENSE                      # MIT Open Source License
 ├── pyproject.toml               # Modern PEP 518/621 package build configuration
@@ -245,9 +252,48 @@ Expected output preview:
 
 ---
 
-## 7. Experimental Protocols & Reproducibility
+## 7. Interactive Web Application (Streamlit)
 
-### 7.1 Reproducing Experiments
+Une interface web moderne et interactive est disponible à la racine du projet (`app.py`), entièrement en français, organisée en 4 pages spécialisées :
+
+- **Page A — Visualisation GridWorld** :
+  - Rendu visuel de la grille, des obstacles, du départ $(S)$, de l'objectif $(G)$ et de la position de l'agent $(@)$.
+  - Contrôle pas-à-pas interactif : commandes **Réinitialiser**, **Étape suivante** et **Exécuter épisode** (animation dynamique fluide).
+  - Télémétrie en temps réel : compteur d'étapes, récompense cumulée, statut détaillé d'événement.
+  - Choix de l'agent : Q-Learning, Behavioral Cloning ou Hybrid ORL (modèles entraînés ou aléatoires).
+
+- **Page B — Entraînement en Direct** :
+  - Configuration interactive : sélection de l'environnement, hyperparamètres ($\alpha, \gamma, \epsilon$), nombre d'épisodes et de démonstrations.
+  - Suivi métrique dynamique : barre de progression et courbes de taux de succès et de récompense moyenne actualisées en direct.
+  - Transfert direct : mise en cache instantanée de l'agent entraîné pour le tester dans la Page A.
+
+- **Page C — Comparaison Rigoureuse** :
+  - Benchmark simultané des trois stratégies (Pure RL vs BC vs Hybrid ORL) sous conditions identiques.
+  - Tableau comparatif (taux de succès test, récompense moyenne, étapes, épisode de convergence).
+  - Graphiques comparatifs côte-à-côte des courbes d'apprentissage et analyse scientifique des dynamiques.
+
+- **Page D — Résultats Réels & Figures** :
+  - Exploration et téléchargement direct (`.csv`) des résultats réels stockés dans `results/`.
+  - Galerie d'images haute résolution des figures scientifiques sauvegardées dans `figures/`.
+  - Déclencheur direct du script officiel `scripts/run_experiments.py`.
+
+### Lancement sous Windows PowerShell
+
+```powershell
+# 1. Se positionner dans le répertoire du projet
+cd "c:\Users\User\Documents\projet thèse\observational-rl"
+
+# 2. Lancer l'application Streamlit
+streamlit run app.py
+```
+
+L'application s'ouvrira automatiquement dans votre navigateur par défaut à l'adresse `http://localhost:8501`.
+
+---
+
+## 8. Experimental Protocols & Reproducibility
+
+### 8.1 Reproducing Experiments
 
 The testbed allows executing experiments at varying scales:
 
@@ -268,7 +314,7 @@ python scripts/train.py --agent hybrid_orl --env medium --n-episodes 600 --seed 
 python scripts/evaluate.py --env medium --seeds 42 123 999
 ```
 
-### 7.2 Experimental Results
+### 8.2 Experimental Results
 
 Sample benchmark output on `easy` GridWorld:
 
@@ -290,9 +336,9 @@ Running `python scripts/run_experiments.py` automatically populates the `figures
 
 ---
 
-## 8. Test Suite
+## 9. Test Suite
 
-The test suite contains **110 unit and integration tests** guaranteeing 100% interface compliance, mathematical soundness, seed determinism, and BFS solvability.
+The test suite contains **118 unit and integration tests** guaranteeing 100% interface compliance, mathematical soundness, seed determinism, and UI helper reliability.
 
 Run the test suite via pytest:
 
@@ -302,16 +348,17 @@ pytest tests/ -v
 
 ```text
 ============================= test session starts =============================
-tests/test_agents.py ......................... [ 28%]
-tests/test_demonstrations.py ................. [ 60%]
-tests/test_environment.py .................... [ 86%]
-tests/test_training.py ....................... [100%]
-============================ 110 passed in 13.68s =============================
+tests/test_agents.py ......................... [ 21%]
+tests/test_demonstrations.py ................. [ 47%]
+tests/test_environment.py .................... [ 72%]
+tests/test_training.py ....................... [ 93%]
+tests/test_ui.py ............................. [100%]
+============================ 118 passed in 15.96s =============================
 ```
 
 ---
 
-## 9. PhD Research Roadmap & Future Extensions
+## 10. PhD Research Roadmap & Future Extensions
 
 This repository is constructed as an extensible foundation for a doctoral dissertation in Observational RL:
 
@@ -337,7 +384,7 @@ Continuous Action Spaces     (LfO - Learning from Obs)      Learning Dynamics
 
 ---
 
-## 10. Citation & License
+## 11. Citation & License
 
 ### Citation
 
