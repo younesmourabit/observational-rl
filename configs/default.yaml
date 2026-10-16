@@ -1,0 +1,199 @@
+# Default configuration for Observational RL experiments
+# All parameters can be overridden via command-line arguments
+
+# ─────────────────────────────────────────────
+# Reproducibility
+# ─────────────────────────────────────────────
+seeds: [42, 123, 456, 789, 1337]  # Multiple seeds for statistical robustness
+
+# ─────────────────────────────────────────────
+# Environment configurations
+# ─────────────────────────────────────────────
+environments:
+  easy:
+    name: "easy"
+    grid_size: 5
+    n_obstacles: 2
+    start_pos: [0, 0]
+    goal_pos: [4, 4]
+    max_steps: 50
+    reward_goal: 10.0
+    reward_step: -0.1
+    reward_obstacle: -5.0
+    reward_wall: -0.5
+    random_obstacles: false
+
+  medium:
+    name: "medium"
+    grid_size: 8
+    n_obstacles: 8
+    start_pos: [0, 0]
+    goal_pos: [7, 7]
+    max_steps: 100
+    reward_goal: 10.0
+    reward_step: -0.1
+    reward_obstacle: -5.0
+    reward_wall: -0.5
+    random_obstacles: false
+
+  hard:
+    name: "hard"
+    grid_size: 10
+    n_obstacles: 20
+    start_pos: [0, 0]
+    goal_pos: [9, 9]
+    max_steps: 150
+    reward_goal: 10.0
+    reward_step: -0.1
+    reward_obstacle: -5.0
+    reward_wall: -0.5
+    random_obstacles: false
+
+  # Test environments (different obstacle layouts - never seen during training)
+  easy_test:
+    name: "easy_test"
+    grid_size: 5
+    n_obstacles: 2
+    start_pos: [0, 0]
+    goal_pos: [4, 4]
+    max_steps: 50
+    reward_goal: 10.0
+    reward_step: -0.1
+    reward_obstacle: -5.0
+    reward_wall: -0.5
+    random_obstacles: false
+    obstacle_seed: 999   # Different seed → different layout
+
+  medium_test:
+    name: "medium_test"
+    grid_size: 8
+    n_obstacles: 8
+    start_pos: [0, 0]
+    goal_pos: [7, 7]
+    max_steps: 100
+    reward_goal: 10.0
+    reward_step: -0.1
+    reward_obstacle: -5.0
+    reward_wall: -0.5
+    random_obstacles: false
+    obstacle_seed: 999
+
+# ─────────────────────────────────────────────
+# Agent configurations
+# ─────────────────────────────────────────────
+agents:
+  q_learning:
+    learning_rate: 0.1
+    discount_factor: 0.99
+    epsilon_start: 1.0
+    epsilon_end: 0.05
+    epsilon_decay: 0.995
+    name: "Q-Learning"
+
+  behavioral_cloning:
+    learning_rate: 0.001
+    hidden_dims: [64, 64]
+    batch_size: 32
+    n_epochs: 50
+    name: "Behavioral Cloning"
+
+  hybrid_orl:
+    # Phase 1: BC pre-training
+    bc_learning_rate: 0.001
+    bc_hidden_dims: [64, 64]
+    bc_batch_size: 32
+    bc_epochs: 30
+    # Phase 2: RL fine-tuning
+    rl_learning_rate: 0.1
+    rl_discount_factor: 0.99
+    rl_epsilon_start: 0.3    # Lower start: already initialized
+    rl_epsilon_end: 0.05
+    rl_epsilon_decay: 0.998
+    # Q-table initialization from BC policy
+    q_init_from_bc: true
+    name: "Hybrid ORL (BC→QL)"
+
+# ─────────────────────────────────────────────
+# Demonstrations
+# ─────────────────────────────────────────────
+demonstrations:
+  optimal:
+    quality: "optimal"
+    n_demos: 50
+    noise_prob: 0.0          # BFS expert: no random actions
+    description: "BFS shortest-path demonstrations"
+
+  suboptimal:
+    quality: "suboptimal"
+    n_demos: 50
+    noise_prob: 0.2          # 20% random actions injected
+    description: "BFS with 20% random action noise"
+
+  limited:
+    quality: "limited"
+    n_demos: 10              # Very few demonstrations
+    noise_prob: 0.0
+    description: "Only 10 optimal demonstrations"
+
+  very_limited:
+    quality: "very_limited"
+    n_demos: 3
+    noise_prob: 0.0
+    description: "Only 3 optimal demonstrations"
+
+# ─────────────────────────────────────────────
+# Training parameters
+# ─────────────────────────────────────────────
+training:
+  n_episodes: 500            # Episodes per agent per seed (quick mode)
+  n_episodes_full: 2000      # Episodes for full experiment
+  eval_interval: 50          # Evaluate every N episodes
+  eval_episodes: 20          # Episodes per evaluation
+  save_checkpoints: true
+  checkpoint_interval: 250
+
+# ─────────────────────────────────────────────
+# Experiment matrix
+# ─────────────────────────────────────────────
+experiments:
+  # Quick smoke test
+  quick:
+    n_episodes: 200
+    seeds: [42]
+    environments: ["easy"]
+    demo_qualities: ["optimal"]
+    description: "Quick functional test"
+
+  # Full experiment
+  full:
+    n_episodes: 2000
+    seeds: [42, 123, 456, 789, 1337]
+    environments: ["easy", "medium", "hard"]
+    demo_qualities: ["optimal", "suboptimal", "limited", "very_limited"]
+    description: "Full scientific experiment"
+
+  # Ablation: demo quantity
+  demo_quantity:
+    n_episodes: 1000
+    seeds: [42, 123, 456]
+    environments: ["medium"]
+    demo_counts: [3, 5, 10, 20, 50, 100]
+    demo_quality: "optimal"
+    description: "Effect of demonstration quantity"
+
+# ─────────────────────────────────────────────
+# Evaluation
+# ─────────────────────────────────────────────
+evaluation:
+  n_eval_episodes: 100       # Episodes for final evaluation
+  success_threshold: 0.7     # 70% success rate = "solved"
+  convergence_window: 50     # Window to measure convergence
+
+# ─────────────────────────────────────────────
+# Output paths (relative to project root)
+# ─────────────────────────────────────────────
+output:
+  results_dir: "results"
+  figures_dir: "figures"
+  checkpoints_dir: "checkpoints"
+  log_level: "INFO"

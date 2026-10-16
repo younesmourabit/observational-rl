@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Observational Reinforcement Learning: Theory, Architectures and Social Learning Dynamics"
+abstract: >
+  An experimental framework comparing classical Q-learning, Behavioral Cloning,
+  and a hybrid Observational RL approach on configurable GridWorld environments.
+  This project supports doctoral research on the conditions under which learning
+  from observed demonstrations improves agent performance and generalization.
+version: 0.1.0
+date-released: "2026-10-16"
+license: MIT
+repository-code: "https://github.com/your-username/observational-rl"
+keywords:
+  - reinforcement-learning
+  - imitation-learning
+  - observational-learning
+  - behavioral-cloning
+  - q-learning
+  - social-learning
+  - gridworld
+authors:
+  - family-names: "Author"
+    given-names: "Research"
+    affiliation: "University / Research Institution"
+references:
+  - type: article
+    authors:
+      - family-names: "Watkins"
+        given-names: "Christopher J.C.H."
+      - family-names: "Dayan"
+        given-names: "Peter"
+    title: "Q-learning"
+    journal: "Machine Learning"
+    year: 1992
+    volume: 8
+    pages: "279-292"
+    doi: "10.1007/BF00992698"
+  - type: conference-paper
+    authors:
+      - family-names: "Pomerleau"
+        given-names: "Dean A."
+    title: "ALVINN: An Autonomous Land Vehicle in a Neural Network"
+    collection-title: "Advances in Neural Information Processing Systems (NeurIPS)"
+    year: 1989
